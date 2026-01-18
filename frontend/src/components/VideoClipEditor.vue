@@ -249,7 +249,7 @@ const generateClip = async () => {
   generatedClip.value = null;
 
   try {
-    const response = await axios.post(`http://localhost:3000/api/videos/clip/${props.video._id}`, {
+    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/videos/clip/${props.video._id}`, {
       startTime: clipStart.value,
       endTime: clipEnd.value,
       name: `Clip from ${props.video.originalName}`

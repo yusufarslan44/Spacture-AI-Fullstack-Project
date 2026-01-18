@@ -33,7 +33,7 @@
         </div>
         
         <div class="clip-actions">
-          <a :href="`http://localhost:3000/uploads/clips/${clip.filename}`" download class="action-btn download" title="Download">
+          <a :href="`${import.meta.env.VITE_API_BASE_URL}/uploads/clips/${clip.filename}`" download class="action-btn download" title="Download">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
@@ -73,8 +73,8 @@ const fetchClips = async () => {
   loading.value = true;
   try {
     let url = props.fetchAll 
-      ? 'http://localhost:3000/api/videos/clips/all'
-      : `http://localhost:3000/api/videos/clips/${props.videoId}`;
+      ? `${import.meta.env.VITE_API_BASE_URL}/api/videos/clips/all`
+      : `${import.meta.env.VITE_API_BASE_URL}/api/videos/clips/${props.videoId}`;
       
     const response = await axios.get(url);
     clips.value = response.data;
@@ -89,7 +89,7 @@ const deleteClip = async (id) => {
   if(!confirm("Are you sure you want to delete this clip?")) return;
   
   try {
-    await axios.delete(`http://localhost:3000/api/videos/clips/${id}`);
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/videos/clips/${id}`);
     clips.value = clips.value.filter(c => c._id !== id);
   } catch (err) {
     console.error("Failed to delete clip", err);

@@ -20,7 +20,7 @@ export const useVideoStore = defineStore('video', () => {
         formData.append('video', file)
 
         try {
-            const response = await axios.post('http://localhost:3000/api/videos/upload', formData, {
+            const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/videos/upload`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -45,7 +45,7 @@ export const useVideoStore = defineStore('video', () => {
 
     async function fetchVideos() {
         try {
-            const response = await axios.get('http://localhost:3000/api/videos')
+            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/videos`)
             if (response.data && response.data.length > 0) {
                 // Set the most recent video as current
                 currentVideo.value = response.data[0]
