@@ -1,12 +1,12 @@
 <template>
   <main>
-    <!-- Upload Section -->
+
     <transition name="slide-up" mode="out-in">
       <section v-if="!store.currentVideo" key="upload">
         <VideoUpload />
       </section>
 
-      <!-- Player Section -->
+
       <section v-else key="player" class="player-section">
         <div class="player-header">
           <div class="player-text-content">
@@ -21,7 +21,7 @@
             <div
               class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-2xl blur opacity-20 group-hover/back:opacity-60 transition-all duration-500"
             ></div>
-            <button @click="store.clearCurrentVideo()" class="upload-new-button">
+            <button @click="store.clearCurrentVideo()" class="glass-button upload-new-button">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="button-icon"
@@ -46,6 +46,10 @@
         </div>
       </section>
     </transition>
+
+    <div v-if="!store.currentVideo" class="home-gallery-section">
+      <ClipGallery :fetchAll="true" />
+    </div>
   </main>
 </template>
 
@@ -53,12 +57,13 @@
 import { useVideoStore } from "../stores/video";
 import VideoUpload from "../components/VideoUpload.vue";
 import VideoPlayer from "../components/VideoPlayer.vue";
+import ClipGallery from "../components/ClipGallery.vue";
 
 const store = useVideoStore();
 </script>
 
 <style scoped>
-/* Main Content */
+
 main {
   position: relative;
   z-index: 10;
@@ -68,7 +73,7 @@ main {
   width: 100%;
 }
 
-/* Upload Section - Full Screen */
+
 main section[key="upload"] {
   width: 100%;
   flex: 1 1 0%;
@@ -79,7 +84,7 @@ main section[key="upload"] {
   overflow: hidden;
 }
 
-/* Player Section - Wide Layout */
+
 .player-section {
   width: 100%;
   max-width: 80rem;
@@ -112,7 +117,7 @@ main section[key="upload"] {
   }
 }
 
-/* Player Section Styles */
+
 .player-title {
   font-size: 1.5rem;
   font-weight: 700;
@@ -159,7 +164,7 @@ main section[key="upload"] {
   }
 }
 
-/* Upload New Button */
+
 .upload-new-button {
   position: relative;
   display: flex;
@@ -167,19 +172,10 @@ main section[key="upload"] {
   gap: 0.625rem;
   padding: 0.75rem 1.25rem;
   border-radius: 1rem;
-  background-color: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
 }
 
-.upload-new-button:hover {
-  background-color: rgba(51, 65, 85, 0.8);
-  border-color: rgba(34, 211, 238, 0.5);
-  box-shadow: 0 20px 25px -5px rgba(34, 211, 238, 0.2);
-}
+
 
 @media (min-width: 768px) {
   .upload-new-button {
@@ -223,7 +219,7 @@ main section[key="upload"] {
   }
 }
 
-/* Video Player Container */
+
 .video-player-container {
   background-color: rgba(15, 23, 42, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -239,7 +235,7 @@ main section[key="upload"] {
   }
 }
 
-/* Responsive Adjustments */
+
 @media (min-width: 768px) {
   main section[key="upload"] {
     padding: 4rem 1rem;
@@ -260,25 +256,13 @@ main section[key="upload"] {
   }
 }
 
-/* Transitions */
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+.home-gallery-section {
+  width: 100%;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
 }
 
-.slide-up-enter-from {
-  opacity: 0;
-  transform: translateY(30px) scale(0.95);
-}
 
-.slide-up-leave-to {
-  opacity: 0;
-  transform: translateY(-30px) scale(0.95);
-}
-
-.slide-up-enter-to,
-.slide-up-leave-from {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
 </style>

@@ -35,9 +35,13 @@
             v-if="isClipping" 
             :video="video" 
             :videoElement="videoRef" 
-            @close="cancelClipping" 
+            @close="cancelClipping"
+            @clipCreated="onClipCreated"
           />
         </transition>
+
+        <!-- Clips Gallery -->
+        <ClipGallery v-if="video._id" :videoId="video._id" ref="galleryRef" />
 
         <div class="video-info-card">
           <div class="video-info-content">
@@ -211,6 +215,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import VideoClipEditor from "./VideoClipEditor.vue";
+import ClipGallery from "./ClipGallery.vue";
 
 const props = defineProps({
   video: {
@@ -220,6 +225,7 @@ const props = defineProps({
 });
 
 const videoRef = ref(null);
+const galleryRef = ref(null);
 const isClipping = ref(false);
 
 const videoUrl = computed(() => {
@@ -240,6 +246,13 @@ const cancelClipping = () => {
   isClipping.value = false;
   if(videoRef.value) {
       videoRef.value.controls = true;
+  }
+};
+
+const onClipCreated = () => {
+  // Refresh gallery
+  if (galleryRef.value) {
+    galleryRef.value.fetchClips();
   }
 };
 

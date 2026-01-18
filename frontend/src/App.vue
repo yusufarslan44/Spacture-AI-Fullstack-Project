@@ -22,9 +22,17 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue";
 import TheHeader from "./components/TheHeader.vue";
 import TheFooter from "./components/TheFooter.vue";
 import HomeView from "./views/HomeView.vue";
+import { useVideoStore } from "./stores/video";
+
+const store = useVideoStore();
+
+onMounted(() => {
+  store.fetchVideos();
+});
 </script>
 
 <style>

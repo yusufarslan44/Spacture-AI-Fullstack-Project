@@ -43,11 +43,25 @@ export const useVideoStore = defineStore('video', () => {
         error.value = null
     }
 
+    async function fetchVideos() {
+        try {
+            const response = await axios.get('http://localhost:3000/api/videos')
+            if (response.data && response.data.length > 0) {
+                // Set the most recent video as current
+                currentVideo.value = response.data[0]
+            }
+        } catch (err) {
+            console.error("Failed to fetch videos:", err)
+            // Silent error, just don't load anything
+        }
+    }
+
     return {
         currentVideo,
         uploading,
         error,
         uploadVideo,
-        clearCurrentVideo
+        clearCurrentVideo,
+        fetchVideos
     }
 })

@@ -107,7 +107,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['close', 'clipCreated']);
 
 const clipStart = ref(0);
 const clipEnd = ref(5);
@@ -249,13 +249,14 @@ const generateClip = async () => {
   generatedClip.value = null;
 
   try {
-    const response = await axios.post(`http://localhost:3000/api/videos/${props.video._id}/clip`, {
+    const response = await axios.post(`http://localhost:3000/api/videos/clip/${props.video._id}`, {
       startTime: clipStart.value,
       endTime: clipEnd.value,
       name: `Clip from ${props.video.originalName}`
     });
 
     generatedClip.value = response.data;
+    emit('clipCreated', response.data.clip);
   } catch (err) {
     console.error("Clip generation failed:", err);
     clipError.value = err.response?.data?.error || "Failed to generate clip";
