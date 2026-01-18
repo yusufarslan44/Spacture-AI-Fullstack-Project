@@ -41,7 +41,7 @@
         </transition>
 
         <!-- Clips Gallery -->
-        <ClipGallery v-if="video._id" :videoId="video._id" ref="galleryRef" />
+        <ClipGallery v-if="video._id" :videoId="video._id" ref="galleryRef" @clipDeleted="handleClipDeleted" />
 
         <div class="video-info-card">
           <div class="video-info-content">
@@ -253,6 +253,12 @@ const onClipCreated = () => {
   // Refresh gallery
   if (galleryRef.value) {
     galleryRef.value.fetchClips();
+  }
+};
+
+const handleClipDeleted = (count) => {
+  if (count === 0) {
+    store.clearCurrentVideo();
   }
 };
 

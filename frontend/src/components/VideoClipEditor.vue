@@ -163,6 +163,9 @@ const togglePlay = () => {
 
 const checkTime = () => {
   if (!props.videoElement) return;
+  // Ignore checks while seeking to avoid race conditions
+  if (props.videoElement.seeking) return;
+
   if (props.videoElement.currentTime >= clipEnd.value) {
     props.videoElement.pause();
     props.videoElement.currentTime = clipEnd.value; // Snap to end
@@ -170,6 +173,8 @@ const checkTime = () => {
   }
 };
 
+const onPlay = () => { isPlaying.value = true; };
+const onPause = () => { isPlaying.value = false; };
 
 const startDrag = (handle) => {
   draggingHandle.value = handle;
@@ -218,6 +223,8 @@ onUnmounted(() => {
   
   if(props.videoElement) {
       props.videoElement.removeEventListener('timeupdate', checkTime);
+      props.videoElement.removeEventListener('play', onPlay);
+      props.videoElement.removeEventListener('pause', onPause);
       props.videoElement.pause();
   }
 });
@@ -235,6 +242,8 @@ onMounted(() => {
         
 
         props.videoElement.addEventListener('timeupdate', checkTime);
+        props.videoElement.addEventListener('play', onPlay);
+        props.videoElement.addEventListener('pause', onPause);
     }
 });
 

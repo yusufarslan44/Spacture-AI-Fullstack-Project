@@ -16,13 +16,57 @@ exports.uploadVideo = (req, res) => {
         console.log('File uploaded successfully:', req.file);
 
         try {
-            const metadata = await getVideoMetadata(req.file.path);
+            let finalPath = req.file.path;
+            let finalFilename = req.file.filename;
+            const originalPath = req.file.path;
+
+            // Check if transcoding is needed
+            // We'll use a simple heuristic: if extension is not .mp4, convert it.
+            // Or we could use ffprobe to check codec, but ensuring mp4 container is safest for web.
+            const path = require('path');
+            const fs = require('fs');
+            const ffmpeg = require('fluent-ffmpeg');
+
+            const ext = path.extname(req.file.originalname).toLowerCase();
+            const needsTranscoding = ext !== '.mp4'; // Simple check for now. allowed: avi, mkv, mov, etc.
+
+            if (needsTranscoding) {
+                console.log(`Format ${ext} detected. Transcoding to MP4...`);
+
+                const newFilename = path.basename(req.file.filename, path.extname(req.file.filename)) + '_converted.mp4';
+                const newPath = path.join(path.dirname(req.file.path), newFilename);
+
+                await new Promise((resolve, reject) => {
+                    ffmpeg(originalPath)
+                        .output(newPath)
+                        .videoCodec('libx264')
+                        .audioCodec('aac')
+                        .on('end', () => {
+                            console.log('Transcoding finished:', newPath);
+                            // Delete original file
+                            fs.unlink(originalPath, (err) => {
+                                if (err) console.error('Failed to delete original file:', err);
+                            });
+                            resolve();
+                        })
+                        .on('error', (err) => {
+                            console.error('Transcoding error:', err);
+                            reject(err);
+                        })
+                        .run();
+                });
+
+                finalPath = newPath;
+                finalFilename = newFilename;
+            }
+
+            const metadata = await getVideoMetadata(finalPath);
 
             // Save to Database
             const video = new Video({
-                filename: req.file.filename,
-                originalName: req.file.originalname,
-                filePath: req.file.path,
+                filename: finalFilename,
+                originalName: req.file.originalname, // Keep original name for reference
+                filePath: finalPath,
                 metadata: metadata
             });
 

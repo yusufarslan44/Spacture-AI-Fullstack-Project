@@ -8,7 +8,11 @@ export const useVideoStore = defineStore('video', () => {
     const error = ref(null)
 
     async function uploadVideo(file) {
-        if (!file.type.startsWith('video/')) {
+        // Simple check: mime type starts with video/ OR extension is allowed
+        const allowedExts = ['avi', 'mkv', 'flv', 'wmv', 'mov', 'mp4', 'webm'];
+        const ext = file.name.split('.').pop().toLowerCase();
+
+        if (!file.type.startsWith('video/') && !allowedExts.includes(ext)) {
             error.value = "Please upload a valid video file."
             return
         }

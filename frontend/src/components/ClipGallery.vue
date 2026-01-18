@@ -33,6 +33,11 @@
         </div>
         
         <div class="clip-actions">
+          <button @click="shareClip(clip)" class="action-btn share" title="Share">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+            </svg>
+          </button>
           <a :href="`${apiBaseUrl}/uploads/clips/${clip.filename}`" download class="action-btn download" title="Download">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -64,6 +69,7 @@ const props = defineProps({
   }
 });
 
+const emit = defineEmits(['clipDeleted']);
 
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const clips = ref([]);
@@ -91,11 +97,36 @@ const deleteClip = async (id) => {
   if(!confirm("Are you sure you want to delete this clip?")) return;
   
   try {
-    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/videos/clips/${id}`);
+    await axios.delete(`${apiBaseUrl}/api/videos/clips/${id}`);
     clips.value = clips.value.filter(c => c._id !== id);
+    emit('clipDeleted', clips.value.length);
   } catch (err) {
     console.error("Failed to delete clip", err);
     alert("Failed to delete clip");
+  }
+};
+
+const shareClip = async (clip) => {
+  const shareUrl = `${apiBaseUrl}/uploads/clips/${clip.filename}`;
+  
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: clip.name,
+        text: `Check out this clip: ${clip.name}`,
+        url: shareUrl
+      });
+    } catch (err) {
+      console.error("Share failed:", err);
+    }
+  } else {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      alert("Link copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      alert("Failed to copy link.");
+    }
   }
 };
 
@@ -210,6 +241,11 @@ defineExpose({ fetchClips });
 .action-btn:hover {
   background: rgba(255,255,255,0.1);
   color: white;
+}
+
+.action-btn.share:hover {
+  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
 }
 
 .action-btn.delete:hover {

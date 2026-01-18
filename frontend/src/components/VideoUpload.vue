@@ -80,7 +80,7 @@
 
           <h3 class="upload-title">Drag & Drop Video</h3>
           <p class="upload-description">
-            Support for <strong>MP4, MOV, AVI</strong>
+            Support for <strong>MP4, MOV, AVI, MKV, and more</strong>
             <span>Max file size 500MB</span>
           </p>
 
