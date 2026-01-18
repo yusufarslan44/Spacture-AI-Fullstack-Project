@@ -49,6 +49,8 @@ export const useVideoStore = defineStore('video', () => {
             if (response.data && response.data.length > 0) {
                 // Set the most recent video as current
                 currentVideo.value = response.data[0]
+            } else {
+                currentVideo.value = null
             }
         } catch (err) {
             console.error("Failed to fetch videos:", err)
