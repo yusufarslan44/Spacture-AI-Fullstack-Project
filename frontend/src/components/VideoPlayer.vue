@@ -1,19 +1,43 @@
 <template>
   <div class="player-container animate-in">
     <div class="player-grid">
-      <!-- Main Player Column -->
+
       <div class="main-column">
         <div class="video-card group">
           <video
+            ref="videoRef"
             v-if="videoUrl"
             :src="videoUrl"
-            controls
+            :controls="!isClipping"
             class="video-element"
+            @timeupdate="onTimeUpdate"
+            @loadedmetadata="onLoadedMetadata"
           ></video>
 
-          <!-- Overlay Gradient -->
-          <div class="video-overlay group-hover:opacity-100"></div>
+
+          <div 
+            class="video-overlay" 
+            :class="{ 'opacity-0 pointer-events-none': isClipping }"
+          >
+             <button @click="startClipping" class="edit-btn glass-button">
+               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+               </svg>
+               Edit Clip
+             </button>
+          </div>
+
         </div>
+
+
+        <transition name="fade">
+          <VideoClipEditor 
+            v-if="isClipping" 
+            :video="video" 
+            :videoElement="videoRef" 
+            @close="cancelClipping" 
+          />
+        </transition>
 
         <div class="video-info-card">
           <div class="video-info-content">
@@ -26,12 +50,11 @@
           </div>
           <div class="video-badges">
             <span class="badge badge-primary">Video</span>
-            <!-- Future 'Processed' or 'Ready' badge -->
           </div>
         </div>
       </div>
 
-      <!-- Metadata Sidebar -->
+
       <div class="sidebar-column">
         <div class="metadata-card">
           <h3 class="metadata-title">
@@ -51,7 +74,7 @@
           </h3>
 
           <div class="metadata-list">
-            <!-- Duration -->
+
             <div class="metadata-item group">
               <div class="metadata-icon-box bg-purple-soft group-hover:bg-purple-hover">
                 <svg
@@ -77,7 +100,7 @@
 
             <div class="divider"></div>
 
-            <!-- Resolution -->
+
             <div class="metadata-item group">
               <div class="metadata-icon-box bg-cyan-soft group-hover:bg-cyan-hover">
                 <svg
@@ -103,7 +126,7 @@
 
             <div class="divider"></div>
 
-            <!-- Frame Rate -->
+
             <div class="metadata-item group">
               <div class="metadata-icon-box bg-green-soft group-hover:bg-green-hover">
                 <svg
@@ -129,7 +152,33 @@
 
             <div class="divider"></div>
 
-            <!-- Codec -->
+
+            <div class="metadata-item group">
+              <div class="metadata-icon-box bg-purple-soft group-hover:bg-purple-hover">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="icon-md"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                  />
+                </svg>
+              </div>
+              <div class="metadata-text">
+                <span class="metadata-label">Total Frames</span>
+                <span class="metadata-value">{{ video.metadata?.frameCount || 'N/A' }}</span>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+
             <div class="metadata-item group">
               <div class="metadata-icon-box bg-pink-soft group-hover:bg-pink-hover">
                 <svg
@@ -160,7 +209,8 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import VideoClipEditor from "./VideoClipEditor.vue";
 
 const props = defineProps({
   video: {
@@ -169,19 +219,41 @@ const props = defineProps({
   },
 });
 
+const videoRef = ref(null);
+const isClipping = ref(false);
+
 const videoUrl = computed(() => {
   if (!props.video || !props.video.filename) return "";
   return `http://localhost:3000/uploads/${props.video.filename}`;
 });
 
 const formatDuration = (seconds) => {
-  if (!seconds) return "N/A";
+  if (typeof seconds === 'undefined' || seconds === null) return "00:00:00";
   return new Date(seconds * 1000).toISOString().substr(11, 8);
 };
+
+const startClipping = () => {
+  isClipping.value = true;
+};
+
+const cancelClipping = () => {
+  isClipping.value = false;
+  if(videoRef.value) {
+      videoRef.value.controls = true;
+  }
+};
+
+const onTimeUpdate = () => {
+  // logic handled in child or native controls
+};
+
+const onLoadedMetadata = () => {
+  // handled
+}
 </script>
 
 <style scoped>
-/* Main Container & Grid */
+
 .player-container {
   width: 100%;
 }
@@ -199,7 +271,7 @@ const formatDuration = (seconds) => {
   }
 }
 
-/* Columns */
+
 .main-column {
   display: flex;
   flex-direction: column;
@@ -212,7 +284,7 @@ const formatDuration = (seconds) => {
   gap: 1rem;
 }
 
-/* Video Card */
+
 .video-card {
   position: relative;
   border-radius: 1rem;
@@ -240,12 +312,25 @@ const formatDuration = (seconds) => {
   pointer-events: none;
   position: absolute;
   inset: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 1.5rem;
   background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
   opacity: 0;
   transition: opacity 0.3s ease;
+  z-index: 20;
 }
 
-/* Video Info Card */
+.video-card:hover .video-overlay {
+  opacity: 1;
+}
+
+.video-overlay button {
+  pointer-events: auto;
+}
+
+
 .video-info-card {
   display: flex;
   flex-direction: column;
@@ -298,7 +383,7 @@ const formatDuration = (seconds) => {
   text-overflow: ellipsis;
 }
 
-/* Badges */
+
 .video-badges {
   display: flex;
   gap: 0.5rem;
@@ -320,7 +405,7 @@ const formatDuration = (seconds) => {
   border-color: rgba(6, 182, 212, 0.2);
 }
 
-/* Metadata Card */
+
 .metadata-card {
   background-color: rgba(30, 41, 59, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -433,32 +518,7 @@ const formatDuration = (seconds) => {
   margin: 0.5rem 0;
 }
 
-/* Icons */
-.icon-lg {
-  width: 1.25rem;
-  height: 1.25rem;
-}
 
-@media (min-width: 768px) {
-  .icon-lg {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-}
-
-.icon-md {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-@media (min-width: 768px) {
-  .icon-md {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-}
-
-/* Colors */
 .text-purple { color: #a855f7; }
 .bg-purple-soft { background-color: rgba(51, 65, 85, 0.3); color: #c084fc; }
 .bg-purple-hover { background-color: rgba(168, 85, 247, 0.2); }
@@ -472,17 +532,25 @@ const formatDuration = (seconds) => {
 .bg-pink-soft { background-color: rgba(51, 65, 85, 0.3); color: #f472b6; }
 .bg-pink-hover { background-color: rgba(236, 72, 153, 0.2); }
 
-.animate-in {
-  animation: slideIn 0.4s ease-out forwards;
+
+.edit-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: white;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.15); /* Slightly more visible */
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.2s;
+  z-index: 30;
 }
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+
+.edit-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
 </style>

@@ -40,7 +40,7 @@
 </template>
 
 <style scoped>
-/* Header Styling */
+
 header {
   position: sticky;
   top: 0;
@@ -72,7 +72,7 @@ header {
   }
 }
 
-/* Logo Section */
+
 .logo-section {
   display: flex;
   align-items: center;
@@ -120,7 +120,7 @@ header {
   color: white;
 }
 
-/* Title Typography */
+
 .title-wrapper {
   display: flex;
   flex-direction: column;

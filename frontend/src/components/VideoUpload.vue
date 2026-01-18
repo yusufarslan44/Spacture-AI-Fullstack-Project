@@ -7,16 +7,16 @@
     @dragleave.prevent="dragging = false"
     @drop.prevent="handleDrop"
   >
-    <!-- Animated Border Gradient -->
+
     <div class="gradient-border">
       <div class="gradient-inner"></div>
     </div>
 
-    <!-- Background Glow -->
+
     <div v-if="dragging || store.uploading" class="background-glow"></div>
 
-    <div class="upload-wrapper">
-      <!-- Hero Section -->
+    <div class="upload-wrapper center-col">
+
       <div class="hero-section">
         <h2 class="hero-main-title">Transform Your Video Content</h2>
         <p class="hero-main-description">
@@ -26,15 +26,15 @@
         </p>
       </div>
 
-      <!-- Upload Card Container -->
-      <div class="upload-card">
-        <!-- Uploading State -->
+
+      <div class="upload-card center-col">
+
         <transition name="fade">
-          <div v-if="store.uploading" class="uploading-overlay">
+          <div v-if="store.uploading" class="uploading-overlay center-col">
             <div class="loader-container">
               <div class="loader-ring-bg"></div>
               <div class="loader-ring-active"></div>
-              <div class="loader-icon">
+              <div class="loader-icon center-flex">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   class="icon-bounce"
@@ -56,11 +56,11 @@
           </div>
         </transition>
 
-        <!-- Idle / Drag State -->
-        <div class="idle-content" :class="{ 'dragging-state': dragging }">
+
+        <div class="idle-content center-col" :class="{ 'dragging-state': dragging }">
           <div class="upload-icon-wrapper">
             <div class="icon-glow"></div>
-            <div class="icon-box group-hover:border-cyan-400">
+            <div class="icon-box center-flex group-hover:border-cyan-400">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 class="icon-main group-hover:scale-110"
@@ -116,7 +116,7 @@
       </div>
     </div>
 
-    <!-- Error Message -->
+
     <transition name="slide-up">
       <div v-if="store.error" class="error-toast">
         <svg
@@ -169,7 +169,7 @@ const uploadFile = async (file) => {
 </script>
 
 <style scoped>
-/* Container */
+
 .upload-container {
   position: relative;
   border-radius: 1.5rem;
@@ -180,7 +180,7 @@ const uploadFile = async (file) => {
   transform: scale(1.02);
 }
 
-/* Gradient Border */
+
 .gradient-border {
   position: absolute;
   inset: 0;
@@ -208,7 +208,7 @@ const uploadFile = async (file) => {
   backdrop-filter: blur(24px);
 }
 
-/* Background Glow */
+
 .background-glow {
   position: absolute;
   inset: 0;
@@ -223,15 +223,10 @@ const uploadFile = async (file) => {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Upload Wrapper */
+
 .upload-wrapper {
   position: relative;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3rem;
   padding: 2rem 1rem;
   min-height: calc(100vh - 200px);
 }
@@ -243,7 +238,7 @@ const uploadFile = async (file) => {
   }
 }
 
-/* Hero Section */
+
 .hero-section {
   text-align: center;
   max-width: 48rem;
@@ -290,17 +285,13 @@ const uploadFile = async (file) => {
   }
 }
 
-/* Upload Card */
+
 .upload-card {
   position: relative;
   width: 100%;
   max-width: 56rem;
   padding: 3rem 2rem;
   text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 
 @media (min-width: 768px) {
@@ -309,14 +300,10 @@ const uploadFile = async (file) => {
   }
 }
 
-/* Uploading State */
+
 .uploading-overlay {
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   background-color: rgba(15, 23, 42, 0.95);
   z-index: 20;
   border-radius: 1.375rem;
@@ -355,9 +342,6 @@ const uploadFile = async (file) => {
 .loader-icon {
   position: absolute;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: #06b6d4;
 }
 
@@ -398,15 +382,12 @@ const uploadFile = async (file) => {
   }
 }
 
-/* Idle Content */
+
 .idle-content {
   position: relative;
   z-index: 10;
   transition: all 0.5s ease-out;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .idle-content.dragging-state {
@@ -434,6 +415,7 @@ const uploadFile = async (file) => {
   }
 }
 
+
 .icon-glow {
   position: absolute;
   inset: 0;
@@ -457,9 +439,6 @@ const uploadFile = async (file) => {
   height: 100%;
   background: linear-gradient(to bottom right, #1e293b, #0f172a);
   border-radius: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.5s;
@@ -489,7 +468,7 @@ const uploadFile = async (file) => {
   }
 }
 
-/* Upload Title */
+
 .upload-title {
   font-size: 1.75rem;
   font-weight: 700;
@@ -506,7 +485,7 @@ const uploadFile = async (file) => {
   }
 }
 
-/* Upload Description */
+
 .upload-description {
   color: #94a3b8;
   font-size: 0.9375rem;
@@ -536,7 +515,7 @@ const uploadFile = async (file) => {
   }
 }
 
-/* Browse Button */
+
 .browse-btn-wrapper {
   position: relative;
   display: inline-block;
@@ -596,12 +575,12 @@ const uploadFile = async (file) => {
   height: 1.25rem;
 }
 
-/* Hidden Input */
+
 .hidden-input {
   display: none;
 }
 
-/* Error Toast */
+
 .error-toast {
   position: absolute;
   bottom: -4rem;
@@ -638,75 +617,5 @@ const uploadFile = async (file) => {
 
 .close-btn:hover {
   color: white;
-}
-
-/* Animations */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.4s ease;
-}
-
-.slide-up-enter-from,
-.slide-up-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
-@keyframes gradient {
-  0%,
-  100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(-25%);
-    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-  }
-  50% {
-    transform: translateY(0);
-    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  }
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
 }
 </style>
