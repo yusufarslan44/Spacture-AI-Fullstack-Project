@@ -49,7 +49,9 @@ export const useVideoStore = defineStore('video', () => {
 
     async function fetchVideos() {
         try {
-            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/videos`)
+            // Add cache busting to prevent 304 Not Modified
+            const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/videos?t=${Date.now()}`)
+
             if (response.data && response.data.length > 0) {
                 // Set the most recent video as current
                 currentVideo.value = response.data[0]
@@ -58,7 +60,20 @@ export const useVideoStore = defineStore('video', () => {
             }
         } catch (err) {
             console.error("Failed to fetch videos:", err)
-            // Silent error, just don't load anything
+            // If error (e.g. 404 or network), assume no video
+            currentVideo.value = null
+        }
+    }
+
+    async function deleteVideo(id) {
+        try {
+            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/videos/${id}`)
+            if (currentVideo.value && currentVideo.value._id === id) {
+                currentVideo.value = null
+            }
+        } catch (err) {
+            console.error("Failed to delete video:", err)
+            throw err
         }
     }
 
@@ -68,6 +83,7 @@ export const useVideoStore = defineStore('video', () => {
         error,
         uploadVideo,
         clearCurrentVideo,
-        fetchVideos
+        fetchVideos,
+        deleteVideo
     }
 })

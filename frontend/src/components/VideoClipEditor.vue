@@ -76,7 +76,7 @@
       
       <div v-if="generatedClip" class="generated-box animate-in mt-4">
         <p class="text-xs text-slate-400 mb-2">Clip Ready!</p>
-        <a :href="generatedClip.clipUrl" download class="download-link glass-button">
+        <a :href="`${apiBaseUrl}/uploads/clips/${generatedClip.clip.filename}`" download class="download-link glass-button">
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
@@ -107,6 +107,8 @@ const props = defineProps({
   }
 });
 
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
 const emit = defineEmits(['close', 'clipCreated']);
 
 const clipStart = ref(0);
@@ -115,6 +117,7 @@ const generating = ref(false);
 const generatedClip = ref(null);
 const clipError = ref(null);
 const isPlaying = ref(false);
+const isLooping = ref(false);
 
 const trackRef = ref(null);
 const draggingHandle = ref(null);
@@ -150,8 +153,10 @@ const validateInputs = () => {
 const togglePlay = () => {
   if (!props.videoElement) return;
   if (props.videoElement.paused) {
+    // If outside range, jump to start
     if (props.videoElement.currentTime < clipStart.value || props.videoElement.currentTime >= clipEnd.value) {
          props.videoElement.currentTime = clipStart.value;
+         isLooping.value = true; // Actively seeking to start
     }
     props.videoElement.play();
     isPlaying.value = true;
@@ -166,7 +171,20 @@ const checkTime = () => {
   // Ignore checks while seeking to avoid race conditions
   if (props.videoElement.seeking) return;
 
-  if (props.videoElement.currentTime >= clipEnd.value) {
+  const currentTime = props.videoElement.currentTime;
+
+  // Handle looping state guard
+  if (isLooping.value) {
+      // If we are close to start, we have successfully looped
+      if (Math.abs(currentTime - clipStart.value) < 1.0) {
+          isLooping.value = false;
+      } else {
+          // Still at old position (likely end), ignore this check
+          return;
+      }
+  }
+
+  if (currentTime >= clipEnd.value) {
     props.videoElement.pause();
     props.videoElement.currentTime = clipEnd.value; // Snap to end
     isPlaying.value = false;

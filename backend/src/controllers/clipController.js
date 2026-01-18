@@ -58,8 +58,6 @@ exports.createClip = async (req, res) => {
                     });
                 } catch (dbErr) {
                     console.error('Error saving clip to DB:', dbErr);
-                    // File created but DB failed? Maybe clean up file? 
-                    // For now just error out.
                     res.status(500).json({ error: 'Clip generated but failed to save record' });
                 }
             })

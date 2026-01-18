@@ -120,12 +120,35 @@ const shareClip = async (clip) => {
       console.error("Share failed:", err);
     }
   } else {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+       try {
+         await navigator.clipboard.writeText(shareUrl);
+         alert("Link copied to clipboard!");
+         return;
+       } catch (err) {
+         console.warn("Clipboard API failed, trying fallback...", err);
+       }
+    }
+    
     try {
-      await navigator.clipboard.writeText(shareUrl);
-      alert("Link copied to clipboard!");
+      const textArea = document.createElement("textarea");
+      textArea.value = shareUrl;
+      textArea.style.position = "fixed";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      const successful = document.execCommand('copy');
+      document.body.removeChild(textArea);
+      
+      if (successful) {
+        alert("Link copied to clipboard!");
+      } else {
+        alert("Press Ctrl+C to copy: " + shareUrl);
+      }
     } catch (err) {
-      console.error("Failed to copy:", err);
-      alert("Failed to copy link.");
+      console.error("Fallback copy failed:", err);
+      alert("Press Ctrl+C to copy: " + shareUrl);
     }
   }
 };

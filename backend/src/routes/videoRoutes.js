@@ -7,6 +7,7 @@ const clipController = require('../controllers/clipController');
 router.get('/', videoController.getAllVideos);
 router.get('/clips/all', clipController.getClips);
 router.post('/upload', videoController.uploadVideo);
+router.delete('/:id', videoController.deleteVideo);
 
 // Clips
 router.get('/clips/all', clipController.getClips);

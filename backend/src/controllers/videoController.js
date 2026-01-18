@@ -20,18 +20,14 @@ exports.uploadVideo = (req, res) => {
             let finalFilename = req.file.filename;
             const originalPath = req.file.path;
 
-            // Check if transcoding is needed
-            // We'll use a simple heuristic: if extension is not .mp4, convert it.
-            // Or we could use ffprobe to check codec, but ensuring mp4 container is safest for web.
             const path = require('path');
             const fs = require('fs');
             const ffmpeg = require('fluent-ffmpeg');
 
             const ext = path.extname(req.file.originalname).toLowerCase();
-            const needsTranscoding = ext !== '.mp4'; // Simple check for now. allowed: avi, mkv, mov, etc.
+            const needsTranscoding = ext !== '.mp4';
 
             if (needsTranscoding) {
-                console.log(`Format ${ext} detected. Transcoding to MP4...`);
 
                 const newFilename = path.basename(req.file.filename, path.extname(req.file.filename)) + '_converted.mp4';
                 const newPath = path.join(path.dirname(req.file.path), newFilename);
@@ -95,5 +91,27 @@ exports.getAllVideos = async (req, res) => {
     } catch (error) {
         console.error('Error fetching videos:', error);
         res.status(500).json({ error: 'Failed to fetch videos' });
+    }
+};
+
+exports.deleteVideo = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const video = await Video.findById(id);
+
+        if (!video) {
+            return res.status(404).json({ error: 'Video not found' });
+        }
+
+        const fs = require('fs');
+        if (fs.existsSync(video.filePath)) {
+            fs.unlinkSync(video.filePath);
+        }
+
+        await Video.findByIdAndDelete(id);
+        res.status(200).json({ message: 'Video deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting video:', error);
+        res.status(500).json({ error: 'Failed to delete video' });
     }
 };
