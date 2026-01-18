@@ -33,7 +33,7 @@
         </div>
         
         <div class="clip-actions">
-          <a :href="`${import.meta.env.VITE_API_BASE_URL}/uploads/clips/${clip.filename}`" download class="action-btn download" title="Download">
+          <a :href="`${apiBaseUrl}/uploads/clips/${clip.filename}`" download class="action-btn download" title="Download">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
@@ -64,6 +64,8 @@ const props = defineProps({
   }
 });
 
+
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 const clips = ref([]);
 const loading = ref(false);
 

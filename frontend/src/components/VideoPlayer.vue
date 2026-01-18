@@ -230,7 +230,7 @@ const isClipping = ref(false);
 
 const videoUrl = computed(() => {
   if (!props.video || !props.video.filename) return "";
-  return `http://localhost:3000/uploads/${props.video.filename}`;
+  return `${import.meta.env.VITE_API_BASE_URL}/uploads/${props.video.filename}`;
 });
 
 const formatDuration = (seconds) => {
