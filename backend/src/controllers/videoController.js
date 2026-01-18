@@ -34,6 +34,8 @@ exports.uploadVideo = (req, res) => {
             });
         } catch (metaErr) {
             console.error('Processing error:', metaErr);
+            const fs = require('fs');
+            fs.appendFileSync('error.log', `${new Date().toISOString()} - ${metaErr.message}\n${metaErr.stack}\n\n`);
             res.status(500).json({
                 message: 'Video uploaded but processing failed',
                 error: metaErr.message

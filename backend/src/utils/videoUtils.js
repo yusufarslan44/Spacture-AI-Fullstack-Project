@@ -13,7 +13,7 @@ exports.getVideoMetadata = (filePath) => {
                     duration: format.duration,
                     width: videoStream ? videoStream.width : null,
                     height: videoStream ? videoStream.height : null,
-                    frameRate: videoStream ? videoStream.r_frame_rate : null,
+                    frameRate: videoStream ? eval(videoStream.r_frame_rate) : null,
                     codec: videoStream ? videoStream.codec_name : null,
                     frameCount: videoStream ? videoStream.nb_frames : null
                 });
