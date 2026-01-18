@@ -38,9 +38,12 @@ exports.createClip = async (req, res) => {
                 console.log('Clip generated successfully');
 
                 try {
+                    const sanitizedVideoName = video.originalName.replace(/\s+/g, '_');
+                    const clipName = name ? name.replace(/\s+/g, '_') : `Clip_from_${sanitizedVideoName}`;
+
                     const clip = new Clip({
                         video: video._id,
-                        name: name || `Clip from ${video.originalName}`,
+                        name: clipName,
                         filename: outputFilename,
                         path: outputPath,
                         startTime,
@@ -108,6 +111,31 @@ exports.deleteClip = async (req, res) => {
     } catch (error) {
         console.error('Error deleting clip:', error);
         res.status(500).json({ error: 'Failed to delete clip' });
+    }
+};
+
+exports.downloadClip = async (req, res) => {
+    try {
+        const { filename } = req.params;
+        const path = require('path');
+        const filePath = path.join(__dirname, '../../uploads/clips', filename);
+
+        const fs = require('fs');
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ error: 'Clip file not found' });
+        }
+
+        res.download(filePath, filename, (err) => {
+            if (err) {
+                console.error('Download error:', err);
+                if (!res.headersSent) {
+                    res.status(500).json({ error: 'Failed to download clip' });
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Download controller error:', error);
+        res.status(500).json({ error: 'Server error' });
     }
 };
 

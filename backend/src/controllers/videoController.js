@@ -59,9 +59,10 @@ exports.uploadVideo = (req, res) => {
             const metadata = await getVideoMetadata(finalPath);
 
             // Save to Database
+            const sanitizedOriginalName = req.file.originalname.replace(/\s+/g, '_');
             const video = new Video({
                 filename: finalFilename,
-                originalName: req.file.originalname, // Keep original name for reference
+                originalName: sanitizedOriginalName, // Sanitize spaces
                 filePath: finalPath,
                 metadata: metadata
             });
@@ -113,5 +114,31 @@ exports.deleteVideo = async (req, res) => {
     } catch (error) {
         console.error('Error deleting video:', error);
         res.status(500).json({ error: 'Failed to delete video' });
+    }
+};
+
+exports.downloadVideo = async (req, res) => {
+    try {
+        const { filename } = req.params;
+        const path = require('path');
+        const filePath = path.join(__dirname, '../../uploads', filename);
+
+        // Check if file exists
+        const fs = require('fs');
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ error: 'File not found' });
+        }
+
+        res.download(filePath, filename, (err) => {
+            if (err) {
+                console.error('Download error:', err);
+                if (!res.headersSent) {
+                    res.status(500).json({ error: 'Failed to download file' });
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Download controller error:', error);
+        res.status(500).json({ error: 'Server error' });
     }
 };
